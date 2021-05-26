@@ -1,0 +1,58 @@
+<!-- 事件代理可能是代理模式中最常见的一种应用模式
+也是一道实打实的高频面试题
+它的场景是一个父元素下有多个子元素，
+因为有冒泡，可以让父一级来代理子元素的点击事件
+如下 -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>事件代理</title>
+</head>
+<body>
+  <div id="father">
+    <a href="#">链接1号</a>
+    <a href="#">链接2号</a>
+    <a href="#">链接3号</a>
+    <a href="#">链接4号</a>
+    <a href="#">链接5号</a>
+    <a href="#">链接6号</a>
+  </div>
+</body>
+
+<script> 
+// 假如不用代理模式，我们将循环安装监听函数
+/* const aNodes = document.getElementById('father').getElementsByTagName('a')
+  
+const aLength = aNodes.length
+
+for(let i=0;i<aLength;i++) {
+    aNodes[i].addEventListener('click', function(e) {
+        e.preventDefault()
+        alert(`我是${aNodes[i].innerText}`)                  
+    })
+} */
+/* 考虑到事件本身具有“冒泡”的特性，当我们点击 a 元素时，
+点击事件会“冒泡”到父元素 div 上，从而被监听到。
+如此一来，点击事件的监听函数只需要在 div 元素上被绑定一次即可，
+而不需要在子元素上被绑定 N 次
+——这种做法就是事件代理，它可以很大程度上提高我们代码的性能。 */
+
+// 获取父元素
+const father = document.getElementById('father')
+
+// 给父元素安装一次监听函数
+father.addEventListener('click', function(e) {
+    // 识别是否是目标子元素
+    if(e.target.tagName === 'A') {
+        // 以下是监听函数的函数体
+        e.preventDefault()
+        alert(`我是${e.target.innerText}`)
+    }
+} )
+</script> 
+
+</html>

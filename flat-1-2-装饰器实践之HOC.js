@@ -5,7 +5,7 @@
 这个因为在其它地方有了实现了，所以这里就不重复些了 */
 
 //------------装饰器------------------
-import React, { Component } from 'react'
+/* import React, { Component } from 'react'
 const BorderHoc = WrappedComponent => class extends Component {
   render() {
     return <div style={{ border: 'solid 1px red' }}>
@@ -13,10 +13,10 @@ const BorderHoc = WrappedComponent => class extends Component {
     </div>
   }
 }
-export default borderHoc
+export default borderHoc */
 
 //-----------目标组件--------------------
-import React, { Component } from 'react'
+/* import React, { Component } from 'react'
 import BorderHoc from './BorderHoc'
 
 // 用BorderHoc装饰目标组件
@@ -28,5 +28,5 @@ class TargetComponent extends React.Component {
 }
 
 // export出去的其实是一个被包裹后的组件
-export default TargetComponent 
+export default TargetComponent  */
 

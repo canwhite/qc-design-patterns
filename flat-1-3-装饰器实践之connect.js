@@ -36,7 +36,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(App)
 使得目标组件和redux结合，具备redux提供的数据和能力。
 既然是能力的拓展，那么一定能用装饰器来写
 =========================================*/
-import { connect } from 'react-redux'
+/* import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import action from './action.js'
 
@@ -61,3 +61,4 @@ export default class App extends Component {
     // App的业务逻辑
   }
 }
+ */
