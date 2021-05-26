@@ -1,0 +1,173 @@
+<!-- 装饰器，结构型的第一个 
+装饰器模式：
+在不改变原对象的基础上，通过对其进行包装拓展，使原有对象可以满足用户的更复杂需求
+兄弟，要挂嘛？
+
+ 
+现在假设我们的初始需求是：
+-------------------------------------------
+每个业务中的按钮在点击后都弹出【您还未登陆哦】的弹框
+在弹框被关闭后把按钮的文案改为“快去登录”，同时把按钮置灰。
+
+--------------------------------------------
+假设又很多业务按钮，我们单个去改已有的函数体，
+这种做法违背了我们的“开放封闭原则”
+在每个函数体里塞太多代码又违背了我们的“单一职责原则”
+--------------------------------------------
+so：
+我们压根不关心现有的逻辑是什么
+而只想对它现有的功能做个拓展，只关心拓展出来的那部分功能如何实现
+
+标准：只添加，不修改
+
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>单例模式弹框</title>
+</head>
+<style>
+    #modal {
+        height: 200px;
+        width: 200px;
+        line-height: 200px;
+        /* 用fixed本身就有浮动，也是个好办法 */
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        /* 在本身位置的基础上定义了在每个方向上再移动多少 */
+        transform: translate(-50%, -50%);
+        border: 1px solid black;
+        text-align: center;
+    }
+</style>
+<body>
+	<button id='open'>打开弹框</button>
+	<button id='close'>关闭弹框</button>
+</body>
+<script>
+    // 核心逻辑，这里采用了闭包思路来实现单例模式
+    // 闭包的实现看着真舒服
+    const Modal = (function() {
+    	let modal = null
+    	return function() {
+            if(!modal) {
+            	modal = document.createElement('div')
+            	modal.innerHTML = '您还未登陆呦'
+            	modal.id = 'modal'
+            	modal.style.display = 'none'
+            	document.body.appendChild(modal)
+            }
+            return modal
+    	}
+    })()
+    
+    //为了不被已有的业务逻辑干扰，当务之急是将旧逻辑和新逻辑分离
+    //so:先把旧逻辑抽出来，当然以下部分为ES5的实现
+    /*===============================ES5实现====================================*/
+    function openModal(){
+    	const modal = new Modal()
+    	modal.style.display = 'block'
+
+    }
+    //编写新逻辑
+    
+    // 按钮文案修改逻辑
+    // 【修改和置灰分成两个不同的方法，并以组合的方式出现在最终目标，这是单一职责原则的使用】
+    // 【设计原则并非是板上钉钉的教条，这里代码很少，分开更好，不分开影响也不大】
+    function changeButtonText() {
+        const btn = document.getElementById('open')
+        btn.innerText = '快去登录'
+    }
+
+    // 按钮置灰逻辑
+    function disableButton() {
+        const btn =  document.getElementById('open')
+        btn.setAttribute("disabled", true)
+    }
+
+    // 新版本功能逻辑整合
+    function changeButtonStatus() {
+        changeButtonText()
+        disableButton()
+    }
+
+
+    // 点击打开按钮展示模态框
+    document.getElementById('open').addEventListener('click', function() {
+        // 未点击则不创建modal实例，避免不必要的内存占用;此处不用 new Modal 的形式调用也可以，和 Storage 同理
+    	// const modal = new Modal()
+        // modal.style.display = 'block'
+        // 只添加不修改
+        openModal()
+        changeButtonStatus()
+        
+    })
+    /*===============================ES6实现====================================*/
+    /*     
+        //将按钮实例传给Decorator，以便可以对Decorator进行为所欲为的拓展
+        //当然在ES7中更简单，可以使用@语法糖    
+
+        // 定义打开按钮
+        class OpenButton {
+            // 点击后展示弹框（旧逻辑）
+            onClick() {
+                const modal = new Modal()
+                modal.style.display = 'block'
+            }
+        }
+
+        // 定义按钮对应的装饰器
+        class Decorator {
+            // 将按钮实例传入
+            constructor(open_button) {
+                this.open_button = open_button
+            }
+            
+            onClick() {
+                this.open_button.onClick()
+                // “包装”了一层新逻辑
+                this.changeButtonStatus()
+            }
+            
+            changeButtonStatus() {
+                this.changeButtonText()
+                this.disableButton()
+            }
+            
+            disableButton() {
+                const btn =  document.getElementById('open')
+                btn.setAttribute("disabled", true)
+            }
+            
+            changeButtonText() {
+                const btn = document.getElementById('open')
+                btn.innerText = '快去登录'
+            }
+        }
+
+        const openButton = new OpenButton()
+        const decorator = new Decorator(openButton)
+
+        document.getElementById('open').addEventListener('click', function() {
+            // openButton.onClick()
+            // 此处可以分别尝试两个实例的onClick方法，验证装饰器是否生效
+            decorator.onClick()
+        })
+    */
+        
+    // 点击关闭按钮隐藏模态框
+    document.getElementById('close').addEventListener('click', function() {
+    	const modal = new Modal()
+    	if(modal) {
+    	    modal.style.display = 'none'
+    	}
+    })
+
+
+
+</script>
+</html>
+
+
