@@ -1,3 +1,40 @@
+"use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _class, _desc, _value, _class2;
+
+function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
+  var desc = {};
+  Object['ke' + 'ys'](descriptor).forEach(function (key) {
+    desc[key] = descriptor[key];
+  });
+  desc.enumerable = !!desc.enumerable;
+  desc.configurable = !!desc.configurable;
+
+  if ('value' in desc || desc.initializer) {
+    desc.writable = true;
+  }
+
+  desc = decorators.slice().reverse().reduce(function (desc, decorator) {
+    return decorator(target, property, desc) || desc;
+  }, desc);
+
+  if (context && desc.initializer !== void 0) {
+    desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
+    desc.initializer = undefined;
+  }
+
+  if (desc.initializer === void 0) {
+    Object['define' + 'Property'](target, property, desc);
+    desc = null;
+  }
+
+  return desc;
+}
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 /* ES7中的装饰器  */
 
 /*
@@ -31,21 +68,22 @@ babel test.js -o babel_test.js
 */
 
 function classDecorator(target) {
-    //此处的target是被修饰的类本身
-    target.hasDecorator = true
-  	return target
+  //此处的target是被修饰的类本身
+  target.hasDecorator = true;
+  return target;
 }
 
 // 将装饰器“安装”到Button类上
-@classDecorator
-class Button {
-    constructor(name) {
-        this.name = name;
-    }
-}
-// 验证装饰器是否生效
-console.log('Button 是否被装饰了：', Button.hasDecorator)
 
+var Button = classDecorator(_class = function Button(name) {
+  _classCallCheck(this, Button);
+
+  this.name = name;
+}) || _class;
+// 验证装饰器是否生效
+
+
+console.log('Button 是否被装饰了：', Button.hasDecorator);
 
 // 当然也可以用同样的语法糖去装饰类中的方法
 //target：对类进行修饰的时候target指向的是类本身，
@@ -67,31 +105,40 @@ get 方法（访问属性时调用的方法，默认为 undefined），
 set（设置属性时调用的方法，默认为 undefined ）
 ------
 很明显，拿到了 descriptor，就相当于拿到了目标方法的控制权。通过修改 descriptor，我们就可以对目标方法为所欲为的逻辑进行拓展了~ */
-function funcDecorator(target,name,descriptor){
+function funcDecorator(target, name, descriptor) {
 
-    let originalMethod = descriptor.value;
-    console.log("--name--",name);//--name-- onClick
-    console.log("--value--",descriptor.value);//--value-- [Function: onClick]
-    //这里相当于把下边Button的onClick重构以下
-    descriptor.value = function(){
-        console.log("我是func的装饰器逻辑");
-        //将当前的函数的内容挂载在原onClick上
-        return originalMethod.apply(this,arguments);
-    }
-    //最后返回描述器
-    return descriptor;
+  var originalMethod = descriptor.value;
+  console.log("--name--", name); //--name-- onClick
+  console.log("--value--", descriptor.value); //--value-- [Function: onClick]
+  //这里相当于把下边Button的onClick重构以下
+  descriptor.value = function () {
+    console.log("我是func的装饰器逻辑");
+    //将当前的函数的内容挂载在原onClick上
+    return originalMethod.apply(this, arguments);
+  };
+  //最后返回描述器
+  return descriptor;
 }
 
-class Button1 {
-    @funcDecorator
-    onClick() { 
-        console.log('我是Func的原有逻辑')
+var Button1 = (_class2 = function () {
+  function Button1() {
+    _classCallCheck(this, Button1);
+  }
+
+  _createClass(Button1, [{
+    key: "onClick",
+    value: function onClick() {
+      console.log('我是Func的原有逻辑');
     }
-}
+  }]);
+
+  return Button1;
+}(), (_applyDecoratedDescriptor(_class2.prototype, "onClick", [funcDecorator], Object.getOwnPropertyDescriptor(_class2.prototype, "onClick"), _class2.prototype)), _class2);
 
 // 验证装饰器是否生效
-const button = new Button1()
-button.onClick()
+
+var button = new Button1();
+button.onClick();
 
 /* 
 所谓语法糖，即为“美好的表象”;
@@ -102,41 +149,6 @@ button.onClick()
 /* 装饰器调用的时机
 装饰器函数执行的时候，Button实例并不存在，因为实例是运行时动态生成的
 而装饰器在静态编译阶段就执行了 */
-
-
-/* 生产实践 */
-/* ====================实践一=========================：
-首先是HOC，这个是因为接收一个comp，然后提供容器，最后再返回一个comp
-高阶组件就是一个函数，且该函数接受一个组件作为参数，并返回一个新的组件。
-这个因为在其它地方有了实现了，所以这里就不重复些了 */
-import React, { Component } from 'react'
-
-/* const BorderHoc = WrappedComponent => class extends Component {
-  render() {
-    return <div style={{ border: 'solid 1px red' }}>
-      <WrappedComponent />
-    </div>
-  }
-}
-export default borderHoc
-
-//----------------------------------------------
-import React, { Component } from 'react'
-import BorderHoc from './BorderHoc'
-
-// 用BorderHoc装饰目标组件
-@BorderHoc 
-class TargetComponent extends React.Component {
-  render() {
-    // 目标组件具体的业务逻辑
-  }
-}
-
-// export出去的其实是一个被包裹后的组件
-export default TargetComponent */
-
-
-
 
 /* ====================实践二=========================：
 使用装饰器修改react-redux
@@ -199,7 +211,6 @@ export default class App extends Component {
     // App的业务逻辑
   }
 } */
-
 
 /* ====================实践三=========================：
 
