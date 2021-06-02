@@ -13,7 +13,7 @@ class SingleDog{
     static getInstance(){
         //如果不存在，再非就进去了
         if(!SingleDog.instance){
-            //那再创建它
+            //那再创建它，实例化自身
             SingleDog.instance = new SingleDog();
         }
         return SingleDog.instance;
