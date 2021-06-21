@@ -117,6 +117,8 @@ function askPrice(tag, originPrice) {
 
 //我们把询价算法收敛到一个对象里，定义一个询价处理器对象
 const priceProcessor = {
+    //策略模式基本的表现可以写成这种
+    //map-function的形式
     pre(originPrice) {
       if (originPrice >= 100) {
         return originPrice - 20;
