@@ -37,6 +37,7 @@ function classDecorator(target) {
 }
 
 // 将装饰器“安装”到Button类上
+// 相当于把目标类传入作为参数，装饰类相当于一个容器
 @classDecorator
 class Button {
     constructor(name) {
