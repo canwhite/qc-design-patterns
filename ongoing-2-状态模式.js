@@ -99,7 +99,8 @@ class CoffeeMaker {
       this.leftMilk = '500ml';
     }
     
-    //内部类，暴露外层属性
+    //内部map，还要暴露外层属性
+    //内部map的组成还是map-function
     stateToProcessor = {
 /*        --this <ref *1> {
             that: CoffeeMaker {
@@ -123,7 +124,11 @@ class CoffeeMaker {
             state: 'american',
             leftMilk: '500ml'
           } */
-      that: this,//这里的that相当于CoffeeMaker的外键，that指向的是CoffeeMaker
+
+
+      /* 这里的that相当于CoffeeMaker的外键，
+      that指向的是CoffeeMaker*/
+      that: this,
 
       american() {
         console.log("--this",this);
