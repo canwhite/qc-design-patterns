@@ -99,7 +99,7 @@ class CoffeeMaker {
       this.leftMilk = '500ml';
     }
     
-    //内部类
+    //内部类，暴露外层属性
     stateToProcessor = {
 /*        --this <ref *1> {
             that: CoffeeMaker {
