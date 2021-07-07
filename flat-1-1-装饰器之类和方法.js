@@ -30,8 +30,12 @@ babel test.js -o babel_test.js
 
 */
 
-function classDecorator(target) {
-    //此处的target是被修饰的类本身
+function classDecorator(target,name,descriptor) {
+    //此处的target是被修饰的类本身，这里只是改变了它的属性值
+    console.log("class target",target);
+    console.log("class name",name);//class中不考虑name和descriptor
+    console.log("class des",descriptor);
+
     target.hasDecorator = true
   	return target
 }
@@ -76,7 +80,7 @@ function funcDecorator(target,name,descriptor){
     //这里相当于把下边Button的onClick重构以下
     descriptor.value = function(){
         console.log("我是func的装饰器逻辑");
-        //将当前的函数的内容挂载在原onClick上
+        //重构value,并将原value指向重构的value
         return originalMethod.apply(this,arguments);
     }
     //最后返回描述器

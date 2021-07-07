@@ -5,32 +5,32 @@ var _createClass = function () { function defineProperties(target, props) { for 
 var _class, _desc, _value, _class2;
 
 function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
-  var desc = {};
-  Object['ke' + 'ys'](descriptor).forEach(function (key) {
-    desc[key] = descriptor[key];
-  });
-  desc.enumerable = !!desc.enumerable;
-  desc.configurable = !!desc.configurable;
+    var desc = {};
+    Object['ke' + 'ys'](descriptor).forEach(function (key) {
+        desc[key] = descriptor[key];
+    });
+    desc.enumerable = !!desc.enumerable;
+    desc.configurable = !!desc.configurable;
 
-  if ('value' in desc || desc.initializer) {
-    desc.writable = true;
-  }
+    if ('value' in desc || desc.initializer) {
+        desc.writable = true;
+    }
 
-  desc = decorators.slice().reverse().reduce(function (desc, decorator) {
-    return decorator(target, property, desc) || desc;
-  }, desc);
+    desc = decorators.slice().reverse().reduce(function (desc, decorator) {
+        return decorator(target, property, desc) || desc;
+    }, desc);
 
-  if (context && desc.initializer !== void 0) {
-    desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
-    desc.initializer = undefined;
-  }
+    if (context && desc.initializer !== void 0) {
+        desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
+        desc.initializer = undefined;
+    }
 
-  if (desc.initializer === void 0) {
-    Object['define' + 'Property'](target, property, desc);
-    desc = null;
-  }
+    if (desc.initializer === void 0) {
+        Object['define' + 'Property'](target, property, desc);
+        desc = null;
+    }
 
-  return desc;
+    return desc;
 }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -67,18 +67,23 @@ babel test.js -o babel_test.js
 
 */
 
-function classDecorator(target) {
-  //此处的target是被修饰的类本身
-  target.hasDecorator = true;
-  return target;
+function classDecorator(target, name, descriptor) {
+    //此处的target是被修饰的类本身，这里只是改变了它的属性值
+    console.log("class target", target);
+    console.log("class name", name);
+    console.log("class des", descriptor);
+
+    target.hasDecorator = true;
+    return target;
 }
 
 // 将装饰器“安装”到Button类上
+// 相当于把目标类传入作为参数，装饰类相当于一个容器
 
 var Button = classDecorator(_class = function Button(name) {
-  _classCallCheck(this, Button);
+    _classCallCheck(this, Button);
 
-  this.name = name;
+    this.name = name;
 }) || _class;
 // 验证装饰器是否生效
 
@@ -107,32 +112,32 @@ set（设置属性时调用的方法，默认为 undefined ）
 很明显，拿到了 descriptor，就相当于拿到了目标方法的控制权。通过修改 descriptor，我们就可以对目标方法为所欲为的逻辑进行拓展了~ */
 function funcDecorator(target, name, descriptor) {
 
-  var originalMethod = descriptor.value;
-  console.log("--name--", name); //--name-- onClick
-  console.log("--value--", descriptor.value); //--value-- [Function: onClick]
-  //这里相当于把下边Button的onClick重构以下
-  descriptor.value = function () {
-    console.log("我是func的装饰器逻辑");
-    //将当前的函数的内容挂载在原onClick上
-    return originalMethod.apply(this, arguments);
-  };
-  //最后返回描述器
-  return descriptor;
+    var originalMethod = descriptor.value;
+    console.log("--name--", name); //--name-- onClick
+    console.log("--value--", descriptor.value); //--value-- [Function: onClick]
+    //这里相当于把下边Button的onClick重构以下
+    descriptor.value = function () {
+        console.log("我是func的装饰器逻辑");
+        //重构value,并将原value指向重构的value
+        return originalMethod.apply(this, arguments);
+    };
+    //最后返回描述器
+    return descriptor;
 }
 
 var Button1 = (_class2 = function () {
-  function Button1() {
-    _classCallCheck(this, Button1);
-  }
-
-  _createClass(Button1, [{
-    key: "onClick",
-    value: function onClick() {
-      console.log('我是Func的原有逻辑');
+    function Button1() {
+        _classCallCheck(this, Button1);
     }
-  }]);
 
-  return Button1;
+    _createClass(Button1, [{
+        key: "onClick",
+        value: function onClick() {
+            console.log('我是Func的原有逻辑');
+        }
+    }]);
+
+    return Button1;
 }(), (_applyDecoratedDescriptor(_class2.prototype, "onClick", [funcDecorator], Object.getOwnPropertyDescriptor(_class2.prototype, "onClick"), _class2.prototype)), _class2);
 
 // 验证装饰器是否生效
@@ -149,81 +154,3 @@ button.onClick();
 /* 装饰器调用的时机
 装饰器函数执行的时候，Button实例并不存在，因为实例是运行时动态生成的
 而装饰器在静态编译阶段就执行了 */
-
-/* ====================实践二=========================：
-使用装饰器修改react-redux
-react-redux是热门的状态管理工具。
-在其中，我们需要调用connect方法来把状态和组件绑在一起
-import React, { Component } from 'react'
-import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
-import action from './action.js'
-
-class App extends Component {
-  render() {
-    // App的业务逻辑
-  }
-}
-
-function mapStateToProps(state) {
-  // 假设App的状态对应状态树上的app节点
-  return state.app
-}
-
-function mapDispatchToProps(dispatch) {
-  // 这段看不懂也没关系，下面会有解释。重点理解connect的调用即可
-  return bindActionCreators(action, dispatch)
-}
-
-// 把App组件与Redux绑在一起
-export default connect(mapStateToProps, mapDispatchToProps)(App)
-
-
-*/
-/*========================================
-我们调用connect可以返回一个具有装饰作用的函数；
-这个函数接收一个react组件作为参数connect(...)(App)
-使得目标组件和redux结合，具备redux提供的数据和能力。
-既然是能力的拓展，那么一定能用装饰器来写
-=========================================*/
-/* import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
-import action from './action.js'
-
-function mapStateToProps(state) {
-  return state.app
-}
-
-function mapDispatchToProps(dispatch) {
-  return bindActionCreators(action, dispatch)
-}
-
-// 将connect调用后的结果作为一个装饰器导出
-export default connect(mapStateToProps, mapDispatchToProps)
-
-//在组件文件里引入connect：
-import React, { Component } from 'react'
-import connect from './connect.js'   
-
-@connect
-export default class App extends Component {
-  render() {
-    // App的业务逻辑
-  }
-} */
-
-/* ====================实践三=========================：
-
-优质源码阅读
-这里就要给大家推荐一个非常赞的装饰模式库 —— core-decorators。
-core-decorators 帮我们实现好了一些使用频率较高的装饰器，
-比如@readonly(使目标属性只读)、
-@deprecate(在控制台输出警告，提示用户某个指定的方法已被废除)等等等等。
-@debounce
-这里强烈建议大家把 core-decorators 作为自己的源码阅读材料，
-你能收获的或许比你想象中更多~
-
-
-
-
-*/
