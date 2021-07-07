@@ -29,12 +29,13 @@ npm install babel-cli -g
 babel test.js -o babel_test.js
 
 */
-
-function classDecorator(target,name,descriptor) {
+//classDecorator(target,name,descriptor)
+function classDecorator(target) {
     //此处的target是被修饰的类本身，这里只是改变了它的属性值
     console.log("class target",target);
-    console.log("class name",name);//class中不考虑name和descriptor
-    console.log("class des",descriptor);
+    //class中这两个属性undefined
+    /* console.log("class name",name);
+    console.log("class des",descriptor); */
 
     target.hasDecorator = true
   	return target
