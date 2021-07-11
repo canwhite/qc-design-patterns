@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>命令模式</title>
+</head>
+
+<body>
+  <button id="button1">点击按钮1</button>
+
+  <script>
+        //点击按钮是一件事，但是如果这一件事需要多人协作，那就需要命令模式了
+        var button1 = document.getElementById("button1");
+        //先是将命令和这件事相结合，命令函数实际上是一个中间层
+        //它可以适配所有执行者
+        var setCommond = (button,commond)=>{
+            button.onclick= function() {
+                commond.execute();
+            }
+        }
+        //命令的执行者一
+        var MenuBar = {
+            //执行动作
+            execute:function(){
+                console.log("刷新菜单目录");
+            }
+        }
+
+        //命令方
+        var Commond = function(receiver){
+            this.receiver = receiver;
+        }
+
+
+        //通过命令中间层，执行命令
+        Commond.prototype.execute = function(){
+            this.receiver.execute();
+        }
+
+        //然后命令层将执行方包起来
+        var newCommond = new Commond(MenuBar);
+        
+
+        //将事情和命令结合
+        setCommond(button1,newCommond);
+
+        //可以创建新得commond，包新的命令，继续执行
+
+        
+
+
+  </script>
+</body>
+
+</html>
