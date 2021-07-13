@@ -48,6 +48,36 @@ console.log("s2",s2.getItem("name"));
 
 console.log("s1==s2",s1==s2);
 
+/* 也可以试着写个log */
+
+
+class Elog{
+    //构造函数
+    constructor(env){
+        this.env = env;
+    }
+    static getInstance(env){
+        //判断时候已经new过一个实例
+        if(!Elog.instance){
+            //若是这个唯一的实例不存在，就创建它
+            Elog.instance = new Elog(env);
+        }
+
+        return Elog.instance;
+    }
+    //对外方法
+    elog(data){
+        if(this.env == "development"){
+            console.log(data);
+        }else{
+            console.log("...");
+        }
+    }
+
+}
+
+
+
 /*
 闭包版
 // 先实现一个基础的StorageBase类，把getItem和setItem方法放在它的原型链上
