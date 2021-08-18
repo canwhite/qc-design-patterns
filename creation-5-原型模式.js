@@ -43,16 +43,25 @@ so：ES6中class只是原型的语法糖
 function Dog(name,age){
     this.name = name;
     this.age = age;
+    //重写原型方法
+    this.eat = ()=>{
+        console.log("肉骨头真好吃");
+    }
+    //自己本身的方法
+    this.action = ()=>{
+        console.log("狗狗在草地上撒欢");
+    }
 }
 
 //protoType指向原型，这里因为只有一层，所以指向Object,
 //所以在这里定义的eat方法就是对原型的拓展
 Dog.prototype.eat = function() {
-    console.log('肉骨头真好吃')
+    console.log('吃饭')
 }
 
 //使用dog构造函数创建dog实例，这个实例，注意是实例，有一个__proto__属性指向原型
 const dog = new Dog('旺财',3);
+
 
 
 
@@ -68,9 +77,20 @@ const dog = new Dog('旺财',3);
 
 */
 
-dog.eat();
+dog.__proto__.eat();//原型方法
+dog.eat();//重写了方法
+//这个是Dog本身的方法，在原型里并没有
+dog.action();
+// dog.__proto__.action(); //报错，没有定义在原型上
 
+
+//继承了原型的方法
 console.log(dog.toString());
+//原型对象通过constructor指向构造函数
+console.log(dog.__proto__.constructor);//[Function: Dog]
+
+
+
 
 /* PS:几乎所有的JS中的对象都是位于原型链顶端的Object的实例，除了Object.prototype 
 当然，即使我们手动用Object.create(null)创建一个没有任何原型的对象，那它也不是 Object 的实例
