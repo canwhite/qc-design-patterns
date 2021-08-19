@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>React App</title>
+</head>
+<body>
+<div><label for="">卖方张三说：</label><input type="text" id="sell"><button style="margin-left: 10px" id="sellSubmit">发布</button></div>
+<div><label for="">买方李四说：</label><input type="text" id="buy"><button style="margin-left: 10px" id="buySubmit">发布</button></div>
+<div style="margin-top: 20px;
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 10px;
+    display: inline-block;">
+    <div style="text-align: center">公告台</div>
+    <div style="display: flex">
+    <div style="margin-top: 10px">
+        <span style="background: pink">卖方消息内容:</span>
+        <div id="sellContent"></div>
+    </div>
+    <div style="margin-left: 20px;margin-top: 10px">
+        <span style="background: blue">买房消息内容:</span>
+        <div id="buyContent"></div>
+    </div>
+    </div>
+</div>
+<script>
+/*===================================================
+中介者模式是提供一个中介者来将对象与对象之间多对多的关系变成一对多或者说1对1的关系，以此来解耦对象之间的依赖。
+
+中介者模式与房屋中介类似，现在买卖房屋都是通过中介完成，
+这样买卖双方就不会有太多的联系，
+而是将精力放在自己更重要的事情上。
+
+---------------------------------------------------------
+应用场景：
+
+1.当对象之间存在复杂的网状结构而导致依赖关系混乱难以复用时。
+对象之间存在一对多的关系。一个对象的状态改变会影响其他状态的改变。
+
+2.同事对象不持有中介者，而是在需要的时候直接获取中介者对象并调用。
+--------------------------------------------------------
+结构：
+中介者模式包含抽象中介者、具体中介者、抽象同事类和具体同事类。
+抽象中介者：中介者接口，提供了同事对象注册和转发同事对象信息的抽象方法。
+具体中介者：实现中介者接口，定义一个 list 来管理同事对象，协调各个同事对象之间的交互关系，因此它依赖同事角色。
+抽象同事类：保存中介者对象，提供同事对象交互的抽象方法。实现所有相互影响的同事类的公共功能。
+具体同事类：实现抽象同事类的抽象方法，当需要与其他同事对象交互时，由中介者对象负责。
+具体同事类又分为卖方和买方
+
+使用中介者模式完成房产中介买卖方交易。
+===========================================================*/  
+let sellSubmit = document.getElementById("sellSubmit");
+let buySubmit = document.getElementById("buySubmit");
+let sellContent = document.getElementById("sellContent");
+let buyContent = document.getElementById("buyContent");
+let sell = document.getElementById("sell");
+let buy = document.getElementById("buy");
+//抽象中介者-定义接口
+class Medium{
+    //客户注册
+    register(member){
+        throw new Error("请重新定义注册接口")
+    }
+    //转发
+    relay(from,id){
+        throw new Error("请重新定义转发接口");
+    }
+}
+
+//具体中介者-贝壳
+class EstateMedium extends Medium{
+    constructor(){
+        super();
+        this.list = [];
+    }
+
+    //用户注册，该方法绑定中介和成员
+    register(member){
+        if(!this.list.includes(member)){
+            
+            this.list.push(member);
+            member.setMedium(this);
+        }
+    }
+
+    //转发用户信息
+    relay(from,ad){
+        for(let item of this.list){
+            let name = item.getName();
+            //防止是自己给自己发
+            if(name !=from){
+                i.receive(from,ad);
+            }
+        }
+    }
+
+}
+
+//抽象同事类-卖方和买方
+class Qistomer{
+    constructor(name){
+        this.name = name;
+    }
+    //设置中介
+    setMedium(medium){
+        this.medium = medium;
+    }
+    
+    //获取客户名称
+    getName(){
+        return this.name;
+    }
+    //以下两个是需要rewrite的
+    //发送广告
+    send(ad){
+        throw new Error("send need to rewrite");
+    }
+    //接收广告
+    receive(from,ad){
+        throw new Error("receive need to rewrite");
+    }
+}
+
+//具体同事类-卖方
+class Seller extends Qistomer{
+    constructor(name){
+        super(name);
+        this.name = name;
+        //初始化一个发布内容信息
+        this.content = this.name +"说:" + "<br>";
+    }
+    //发送信息
+    send(ad){
+        this.content+=ad+"<br>";
+        sellContent.innerHTML = this.content;
+        //from就是当前name
+        this.medium.relay(this.name,ad);
+
+    }
+    //接收信息
+    receive(from,id){
+        console.log("接收到一条消息"+from+"说:"+ad);
+    }
+
+}
+
+//具体同事类-买方
+class Buyer extends Qistomer{
+    constructor(name){
+        super(name);
+        this.name = name;
+        //初始化一个发布内容信息
+        this.content = this.name +"说:" + "<br>";
+    }
+    //发送信息
+    send(ad){
+        this.content+=ad+"<br>";
+        buyContent.innerHTML = this.content;
+        this.medium.relay(this.name,ad);
+
+    }
+    //接收信息
+    receive(from,id){
+        console.log("接收到一条消息"+from+"说:"+ad);
+    }
+
+}
+
+//调用
+class Customer{
+    static main(){
+        //先把中介初始化了
+        let md = new EstateMedium();
+        let member1 = new Seller("卖方(张三)");
+        let member2 = new Buyer("买方(李四)");
+
+        md.register(member1);
+        md.register(member2);
+
+
+        sellSubmit.onclick = function () {
+            member1.send(sell.value);
+            sell.value = "";
+        }
+        buySubmit.onclick = function () {
+            member2.send(buy.value);
+            buy.value = "";
+        }
+
+    }
+}
+Customer.main();
+
+
+
+
+
+
+
+
+</script>
+</body>
+</html>
