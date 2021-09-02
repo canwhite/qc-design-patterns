@@ -84,7 +84,7 @@ Coffee.prototype.customerWantsCondiments = function(){
 
 // 当调用init方法时，会找到父类的init方法进行调用。
 var coffee = new Coffee();
-coffee.init();
+coffee.init();//init用的父类的
 //因为自己定义了custom为false，初始化的时候就不会加糖和奶了
 
 /*

@@ -36,6 +36,27 @@ function observe(target) {
     }
 }
 
+//发布者类Dep，触犯订阅者收集的行为
+class Dep {
+    constructor() {
+        // 初始化订阅队列
+        this.subs = []
+    }
+    
+    // 增加订阅者
+    addSub(sub) {
+        this.subs.push(sub)
+    }
+    
+    // 通知订阅者（是不是所有的代码都似曾相识？），
+    notify() {
+        this.subs.forEach((sub)=>{
+            //这里Dep也是身兼双职，除了是订阅者，这里还充当了发布者的工作
+            sub.update()
+        })
+    }
+}
+
 // 定义defineReactive方法
 function defineReactive(target, key, val) {
     // 属性值也可能是object类型，这种情况下需要调用observe进行递归遍历
@@ -60,26 +81,6 @@ function defineReactive(target, key, val) {
     });
 }
 
-//订阅者类Dep，进行notify的具体实现
-class Dep {
-    constructor() {
-        // 初始化订阅队列
-        this.subs = []
-    }
-    
-    // 增加订阅者
-    addSub(sub) {
-        this.subs.push(sub)
-    }
-    
-    // 通知订阅者（是不是所有的代码都似曾相识？），
-    notify() {
-        this.subs.forEach((sub)=>{
-            //这里Dep也是身兼双职，除了是订阅者，这里还充当了发布者的工作
-            sub.update()
-        })
-    }
-}
 
 //订阅者Watcher，Dep本身还有订阅者Watcher
 
