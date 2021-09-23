@@ -36,7 +36,7 @@ function observe(target) {
     }
 }
 
-//发布者类Dep，触犯订阅者收集的行为
+//订阅者类Dep，收集行为
 class Dep {
     constructor() {
         // 初始化订阅队列
@@ -73,13 +73,16 @@ function defineReactive(target, key, val) {
         },
         // 监听器函数和通知
         set: function (value) {
-            /* console.log(`${target}属性的${key}属性从${val}值变成了了${value}`)
-            val = value */
+            console.log("-----",789);
+            console.log(`${target}属性的${key}属性从${val}值变成了了${value}`)
+            val = value 
             // 通知所有订阅者，并且挂载自身
             dep.notify()
         }
     });
 }
+
+
 
 
 //订阅者Watcher，Dep本身还有订阅者Watcher
@@ -88,6 +91,16 @@ class Watcher{
 
     update() {
         //...具体去更新view的操作
+        console.log("---需要更新了哈");
     }
 
 }
+
+
+let target = {
+    a:"123",
+    b:"456",
+    c:"789"
+}
+defineReactive(target,"a","789");
+
